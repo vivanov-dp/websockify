@@ -122,11 +122,11 @@ Traffic Legend:
         try:
             if self.add_clientip:
                 self.log_message("\n   -> Adding client IP:PORT here <-")
-                clientip = '{}:{}'.format(self.client_address)
-                self.log_message("IP: %s", clientip)
+                clientip = '{}:{}'.format(*self.client_address)
+                self.log_message("   IP: %s", clientip)
                 clientip_len = len(clientip)
-                clientip_msg = bytearray.fromhex('2a410000{:>08}0a{}'.format(hex(clientip_len+2)[2:], hex(clientip_len)[2:])) + bytearray(self.client_address, 'ascii')
-                self.log_message(clientip_msg.toString() + "\n")
+                clientip_msg = bytearray.fromhex('2a410000{:>08}0a{}'.format(hex(clientip_len+2)[2:], hex(clientip_len)[2:])) + bytearray(clientip, 'ascii')
+                self.log_message('   ' + str(clientip_msg))
                 tsock.sendall(clientip_msg)
 
             self.do_proxy(tsock)
