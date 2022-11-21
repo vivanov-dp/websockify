@@ -120,6 +120,15 @@ Traffic Legend:
 
         # Start proxying
         try:
+            if self.add_clientip:
+                self.log_message("\n   -> Adding client IP:PORT here <-")
+                clientip = '{}:{}'.format(self.client_address)
+                self.log_message("IP: %s", clientip)
+                clientip_len = len(clientip)
+                clientip_msg = bytearray.fromhex('2a410000{:>08}0a{}'.format(hex(clientip_len+2)[2:], hex(clientip_len)[2:])) + bytearray(self.client_address, 'ascii')
+                self.log_message(clientip_msg.toString() + "\n")
+                tsock.sendall(clientip_msg)
+
             self.do_proxy(tsock)
         finally:
             if tsock:
@@ -292,6 +301,7 @@ class WebSocketProxy(websockifyserver.WebSockifyServer):
         self.unix_target    = kwargs.pop('unix_target', None)
         self.ssl_target     = kwargs.pop('ssl_target', None)
         self.heartbeat      = kwargs.pop('heartbeat', None)
+        self.add_clientip   = kwargs.pop('add_clientip', None)
 
         self.token_plugin = kwargs.pop('token_plugin', None)
         self.host_token = kwargs.pop('host_token', None)
@@ -544,6 +554,8 @@ def websockify_init():
                            "Use this if the messages produced by websockify seem abnormal.")
     parser.add_option("--file-only", action="store_true",
                       help="use this to disable directory listings in web server.")
+    parser.add_option("--add-clientip", action="store_true",
+                      help="Add the connecting client's IP:PORT as the first data on the downstream socket")
 
     (opts, args) = parser.parse_args()
 
@@ -743,6 +755,7 @@ class LibProxyServer(ThreadingMixIn, HTTPServer):
         self.token_plugin   = kwargs.pop('token_plugin', None)
         self.auth_plugin    = kwargs.pop('auth_plugin', None)
         self.heartbeat      = kwargs.pop('heartbeat', None)
+        self.add_clientip   = kwargs.pop('add_clientip', None)
 
         self.token_plugin = None
         self.auth_plugin = None
