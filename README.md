@@ -1,3 +1,9 @@
+*Note on branches in this fork:*
+- **playwing**: modifications for Playwing Sofia's games
+  - add-clientip: use parameter --add-clientip to make websockify inject information about the connecting client's IP:Port as the first data sent on a proxied socket, so the target server will receive the IP. This uses a Google Buffers message with hardcoded custom numbers, so it's not good for pulling back into the upstream websockify repo, but it can be useful as an example implementation
+
+&nbsp;
+
 ## websockify: WebSockets support for any application/server
 
 websockify was formerly named wsproxy and was part of the
